@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>qldv(1) - create a patched ld-linux.so without version information warnings</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#EXAMPLES">EXAMPLES</a>
+    <a href="#AUTHOR">AUTHOR</a>
+    <a href="#SEE-ALSO">SEE ALSO</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>qldv(1)</li>
+    <li class='tc'></li>
+    <li class='tr'>qldv(1)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>qldv</code> - <span class="man-whatis">create a patched ld-linux.so without version information warnings</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p><code>qldv</code> interpreter-to-patch [output=input-interpreter.nodebug]</p>
+
+<p><code>qldv</code> -set executable-to-patch [output=-input-executable-interpreter.nodebug]</p>
+
+<p><code>qldv</code> -find [executable=/bin/sh]</p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p><code>qldv</code> creates a patched version of ld-linux.so (the dynamic linker) that does not emit
+warnings like these:</p>
+
+<pre><code>myprog: /usr/lib/libxyz.so: no version information available (required by myprog)
+</code></pre>
+
+<p>In its first form, <code>qldv</code> takes the first argument (an ld-linux.so interpreter) and
+creates a copy that does not emit version information warnings. If a second argument is
+given, it will be used as the location to place the new, patched linker. If it is
+omitted,the patched linker will be placed in the same directory as the input file,
+with a <code>.nodebug</code> appended to the extension. After running <code>qldv</code>, the user is still
+responsible for having any executables use the new linker.</p>
+
+<p>In its second form, <code>qldv</code> takes an executable that is emitting version information
+warnings. It will both patch the dynamic linker the executable is using <em>and</em> patch the
+executable to point to the new linker. The second argument (the output path) is used
+in the exact same way as before.</p>
+
+<p>In its third form, <code>qldv</code> will print the dynamic linker used by the given executable.
+If no argument is passed, <code>/bin/sh</code> will be used. In this form, it is simply a thin
+wrapper around <code>patchelf --print-interpreter</code>.</p>
+
+<h2 id="EXAMPLES">EXAMPLES</h2>
+
+<p>Patch <code>/lib64/ld-linux.so.2</code>, saving the new version at <code>/lib64/ld-linux.so.2.nodebug</code>:</p>
+
+<pre><code>qldv /lib64/ld-linux.so.2
+</code></pre>
+
+<p>Patch <code>/lib64/ld-linux.so.2</code>, saving the new version at <code>patched-linker.so</code>:</p>
+
+<pre><code>qldv /lib64/patched-linker.so
+</code></pre>
+
+<p>Assuming <code>myprog</code> uses <code>/lib64/ld-linux.so.2</code>, patch <code>/lib64/ld-linux.so.2</code>, saving the
+new version at <code>/lib64/ld-linux.so.2.nodebug</code>, and update <code>myprog</code> to point to the new
+version:</p>
+
+<pre><code>qldv -set myprog
+</code></pre>
+
+<p>Assuming <code>myprog</code> uses <code>/lib64/ld-linux.so.2</code>, patch <code>/lib64/ld-linux.so.2</code>, saving the
+new version at <code>patched-linker.so</code>, and update <code>myprog</code> to point to the new version:</p>
+
+<pre><code>qldv -set myprog patched-linker.so
+</code></pre>
+
+<p>Print the path to the dynamic linker used by <code>/bin/sh</code>:</p>
+
+<pre><code>qldv -find
+</code></pre>
+
+<p>Print the path to the dynamic linker used by <code>myprog</code>:</p>
+
+<pre><code>qldv -find myprog
+</code></pre>
+
+<h2 id="AUTHOR">AUTHOR</h2>
+
+<p>Ryan Gonzalez &lt;rymg19@gmail.com&gt;</p>
+
+<h2 id="SEE-ALSO">SEE ALSO</h2>
+
+<p><code>ld.so</code>(8)</p>
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>January 2018</li>
+    <li class='tr'>qldv(1)</li>
+  </ol>
+
+  </div>
+</body>
+</html>
