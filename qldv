@@ -35,7 +35,7 @@ find_exe() {
 }
 
 debug() {
-  [ -n "$PATCH_INTERP_DEBUG" ] && echo "DEBUG: $@" >&2
+  [ -n "$QLDV_DEBUG" ] && echo "DEBUG: $@" >&2 ||:
 }
 
 set -e
@@ -44,12 +44,12 @@ if [ -z "$1" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo 'usage: qldv <interpreter path> [<output path>=<input>.nodebug]'
   echo '       qldv -set <executable> [<output interpreter path>=<input>.nodebug]'
   echo '       qldv -find [<executable>=/bin/sh]'
-  echo 'set PATCH_INTERP_DEBUG to have verbose output'
+  echo 'set QLDV_DEBUG to have verbose output'
   echo 'man qldv for more info'
   exit
 fi
 
-[ -n "$PATCH_INTERP_DEBUG" ] && set -x
+[ -n "$QLDV_DEBUG" ] && set -x ||:
 
 find_exe lldb || find_exe gdb || error 'gdb or lldb is required'
 find_exe dd || error 'dd is required'
@@ -83,12 +83,12 @@ debug "input: $input, output: $output"
 if find_exe lldb; then
   where=`lldb "$output" -bo 'di -F intel -n _dl_check_all_versions' 2>&1 | \
          grep -B10 _dl_check_map_versions | tac | grep 'mov *esi' | \
-         sed 's/.*\[\(.*\)\].*/\1/'`
+         sed 's/.*\[\(.*\)\].*/\1/' ||:`
 else
   where=`gdb "$output" -batch -ex 'set disassembly-flavor intel' \
              -ex 'disas _dl_check_all_versions' 2>&1 | \
              grep -B10 _dl_check_all_versions | tac | grep 'mov *esi' | \
-             awk '{ print $1; }'`
+             awk '{ print $1; }' ||:`
 fi
 
 debug "where: $where"
