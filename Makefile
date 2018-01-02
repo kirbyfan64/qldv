@@ -1,4 +1,5 @@
-DESTDIR=/usr/local
+DESTDIR=
+PREFIX=usr/local
 
 .PHONY: install ronn
 
@@ -6,9 +7,13 @@ all:
 	# Use 'make install' to install qldv.
 
 install:
-	install -Dm 755 qldv $(DESTDIR)/bin/qldv
-	install -Dm 644 doc/qldv.1 $(DESTDIR)/share/man/man1/qldv.1
+	install -Dm 755 qldv $(DESTDIR)/$(PREFIX)/bin/qldv
+	install -Dm 644 doc/qldv.1 $(DESTDIR)/$(PREFIX)/share/man/man1/qldv.1
 	# Run 'mandb' to refresh the man database.
+
+uninstall:
+	rm $(DESTDIR)/$(PREFIX)/bin/qldv
+	rm $(DESTDIR)/$(PREFIX)/share/man/man1/qldv.1
 
 ronn:
 	ronn doc/qldv.ronn
