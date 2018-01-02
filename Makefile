@@ -12,3 +12,8 @@ install:
 
 ronn:
 	ronn doc/qldv.ronn
+
+site: ronn
+	[ -d site ] || git clone https://github.com/kirbyfan64/qldv.git -b gh-pages site
+	cp doc/qldv.1.html site/
+	ln -sf qldv.1.html site/index.html
