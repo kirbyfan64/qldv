@@ -8,6 +8,8 @@
 
 `qldv` -find [executable=/bin/sh]
 
+`qldv` -version
+
 ## DESCRIPTION
 
 `qldv` creates a patched version of ld-linux.so (the dynamic linker) that does not emit
@@ -32,6 +34,8 @@ in the exact same way as before.
 In its third form, `qldv` will print the dynamic linker used by the given executable.
 If no argument is passed, `/bin/sh` will be used. In this form, it is simply a thin
 wrapper around `patchelf --print-interpreter`.
+
+In its fourth form, `qldv` will print its version and license, and then exit.
 
 ## EXAMPLES
 

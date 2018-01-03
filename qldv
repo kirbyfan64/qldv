@@ -24,6 +24,9 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# (end of license)
+
+VERSION=0.1
 
 error() {
   echo "$@" >&2
@@ -44,12 +47,20 @@ if [ -z "$1" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo 'usage: qldv <interpreter path> [<output path>=<input>.nodebug]'
   echo '       qldv -set <executable> [<output interpreter path>=<input>.nodebug]'
   echo '       qldv -find [<executable>=/bin/sh]'
+  echo '       qldv -version'
   echo 'set QLDV_DEBUG to have verbose output'
   echo 'man qldv for more info'
   exit
 fi
 
 [ -n "$QLDV_DEBUG" ] && set -x ||:
+
+if [ "$1" = "-version" ]; then
+  echo "qldv $VERSION"
+  echo
+  sed -n '/# ''Copyright/,/# (end of license)/p' "$0" | sed 's/^# //' | head -n -1
+  exit
+fi
 
 find_exe lldb || find_exe gdb || error 'gdb or lldb is required'
 find_exe dd || error 'dd is required'

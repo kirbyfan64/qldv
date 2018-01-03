@@ -15,6 +15,9 @@
 .P
 \fBqldv\fR \-find [executable=/bin/sh]
 .
+.P
+\fBqldv\fR \-version
+.
 .SH "DESCRIPTION"
 \fBqldv\fR creates a patched version of ld\-linux\.so (the dynamic linker) that does not emit warnings like these:
 .
@@ -36,6 +39,9 @@ In its second form, \fBqldv\fR takes an executable that is emitting version info
 .
 .P
 In its third form, \fBqldv\fR will print the dynamic linker used by the given executable\. If no argument is passed, \fB/bin/sh\fR will be used\. In this form, it is simply a thin wrapper around \fBpatchelf \-\-print\-interpreter\fR\.
+.
+.P
+In its fourth form, \fBqldv\fR will print its version and license, and then exit\.
 .
 .SH "EXAMPLES"
 Patch \fB/lib64/ld\-linux\.so\.2\fR, saving the new version at \fB/lib64/ld\-linux\.so\.2\.nodebug\fR:
