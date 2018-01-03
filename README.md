@@ -23,7 +23,14 @@ For more info, view the man page at `doc/qldv.1` or [online](https://refi64.com/
 
 ## Installation
 
+If you use Arch Linux, you can grab qldv from AUR under the name
+[qldv-git](https://aur.archlinux.org/packages/qldv-git).
+
+Otherwise, clone and install:
+
 ```
+$ git clone https://github.com/kirbyfan64/qldv.git
+$ cd qldv
 $ make install
 ```
 
