@@ -80,6 +80,8 @@
 
 <p><code>qldv</code> -find [executable=/bin/sh]</p>
 
+<p><code>qldv</code> -version</p>
+
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
 <p><code>qldv</code> creates a patched version of ld-linux.so (the dynamic linker) that does not emit
@@ -103,6 +105,8 @@ in the exact same way as before.</p>
 <p>In its third form, <code>qldv</code> will print the dynamic linker used by the given executable.
 If no argument is passed, <code>/bin/sh</code> will be used. In this form, it is simply a thin
 wrapper around <code>patchelf --print-interpreter</code>.</p>
+
+<p>In its fourth form, <code>qldv</code> will print its version and license, and then exit.</p>
 
 <h2 id="EXAMPLES">EXAMPLES</h2>
 
