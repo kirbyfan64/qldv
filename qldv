@@ -110,4 +110,4 @@ debug "where: $where"
 printf '\x31\xf6\x90' | dd of="$output" bs=1 seek=`printf %d $where` count=3  \
                            conv=notrunc status=none
 
-[ -n "$doset" ] && patchelf --set-interpreter "$output" "$doset"
+[ -n "$doset" ] && patchelf --set-interpreter "$output" "$doset" ||:
