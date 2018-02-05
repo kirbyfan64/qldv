@@ -62,7 +62,7 @@ if [ "$1" = "-version" ]; then
   exit
 fi
 
-find_exe lldb || find_exe gdb || error 'gdb or lldb is required'
+find_exe objdump || error 'gdb or lldb is required'
 find_exe dd || error 'dd is required'
 find_exe ldd || error 'ldd is required'
 find_exe patchelf || error 'patchelf is required'
@@ -91,23 +91,16 @@ chmod +x "$output"
 
 debug "input: $input, output: $output"
 
-if find_exe lldb; then
-  where=`lldb "$output" -bo 'di -F intel -n _dl_check_all_versions' 2>&1 | \
-         grep -B10 _dl_check_map_versions | tac | grep 'mov *esi' | \
-         sed 's/.*\[\(.*\)\].*/\1/' ||:`
-else
-  where=`gdb "$output" -batch -ex 'set disassembly-flavor intel' \
-             -ex 'disas _dl_check_all_versions' 2>&1 | \
-             grep -B10 _dl_check_all_versions | tac | grep 'mov *esi' | \
-             awk '{ print $1; }' ||:`
-fi
+where=`objdump -Mintel -d "$output" | sed '/<_dl_check_all_versions>:/,/^$/!d' | \
+       grep -B10 _dl_check_map_versions | tac | grep 'mov *esi' | \
+       sed 's/.*\[\(.*\)\].*/\1/' ||:`
 
 debug "where: $where"
 
-[ -n "$where" ] && (echo "$where" | grep -q '^0x[1-9a-f]*$') || \
+[ -n "$where" ] && (echo "$where" | grep -q '^[1-9a-f]*$') || \
   error 'Failed to locate _dl_check_all_versions symbol'
 
-printf '\x31\xf6\x90' | dd of="$output" bs=1 seek=`printf %d $where` count=3  \
+printf '\x31\xf6\x90' | dd of="$output" bs=1 seek=`printf %d 0x$where` count=3  \
                            conv=notrunc status=none
 
 [ -n "$doset" ] && patchelf --set-interpreter "$output" "$doset" ||:
