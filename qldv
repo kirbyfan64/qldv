@@ -93,7 +93,7 @@ debug "input: $input, output: $output"
 
 where=`objdump -Mintel -d "$output" | sed '/<_dl_check_all_versions>:/,/^$/!d' | \
        grep -B10 _dl_check_map_versions | tac | grep 'mov *esi' | \
-       sed 's/.*\[\(.*\)\].*/\1/' ||:`
+       grep -o '^  *[0-9]*' | tr -d ' ' ||:`
 
 debug "where: $where"
 
