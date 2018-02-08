@@ -62,7 +62,7 @@ if [ "$1" = "-version" ]; then
   exit
 fi
 
-find_exe objdump || error 'gdb or lldb is required'
+find_exe objdump || error 'objdump is required'
 find_exe dd || error 'dd is required'
 find_exe ldd || error 'ldd is required'
 find_exe patchelf || error 'patchelf is required'
