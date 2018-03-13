@@ -86,21 +86,41 @@ fi
 
 output="${2:-$input.nodebug}"
 [ -f "$input" ] || error "$input does not exist"
-cp "$input" "$output"
-chmod +x "$output"
 
 debug "input: $input, output: $output"
 
-where=`objdump -Mintel -d "$output" | sed '/<_dl_check_all_versions>:/,/^$/!d' | \
-       grep -B10 _dl_check_map_versions | tac | grep 'mov *esi' | \
-       grep -o '^  *[0-9]*' | tr -d ' ' ||:`
+column=`objdump -s -j .rodata "$input" | grep 'no versi'`
+[ -n "$column" ] || error 'Failed to locate address of version string.'
+
+addr=`echo "$column" | sed 's/^ *//' | cut -d ' ' -f1`
+[ -n "$addr" ] || error 'Failed to locate address of version string.'
+debug "addr: $addr"
+
+if echo "$column" | grep -q 'no versi$'; then
+    debug "moving address"
+  addr=`echo "$addr" | sed 's/0$/8/'`
+fi
+
+fwhere=`objdump -Mintel -d "$input" | grep -B10 "# $addr" | tac | grep 'test ' | \
+        head -1 | grep -o '^ *[0-9a-z]*' | tr -d ' ' ||:`
+[ -n "$fwhere" ] || error "Failed to local test instruction prior to usage of $addr."
+debug "fwhere: $fwhere"
+
+read -r floc offset <<<"`objdump -Mintel -F -d "$input" | \
+  sed "/> (File Offset:.*):/h;/^ *$fwhere:/!d;x" | \
+  grep -o -e '^ *[0-9a-z]*' -e '0x[0-9a-z]*)' | tr -d ' )' | tr '\n' ' '`"
+[ -n "$floc" ] && [ -n "$offset" ] || \
+  error "Failed locate nearest file offset to $fwhere."
+debug "floc: $floc, offset: $offset"
+
+foffset=$(expr `printf %d 0x$fwhere` - `printf %d 0x$floc`)
+where=$(expr `printf %d $offset` + $foffset)
 
 debug "where: $where"
 
-[ -n "$where" ] && (echo "$where" | grep -q '^[1-9a-f]*$') || \
-  error 'Failed to locate _dl_check_all_versions symbol'
-
-printf '\x31\xf6\x90' | dd of="$output" bs=1 seek=`printf %d 0x$where` count=3  \
-                           conv=notrunc status=none
+cp "$input" "$output"
+dd if="$input" bs=1 skip=$where count=3 status=none | sed 's/\x85/\x31/' | \
+  dd of="$output" bs=1 seek=$where count=3 conv=notrunc status=none
+chmod +x "$output"
 
 [ -n "$doset" ] && patchelf --set-interpreter "$output" "$doset" ||:
