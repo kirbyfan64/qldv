@@ -101,9 +101,9 @@ if echo "$column" | grep -q 'no versi$'; then
   addr=`echo "$addr" | sed 's/0$/8/'`
 fi
 
-fwhere=`objdump -Mintel -d "$input" | grep -B10 "# $addr" | tac | grep 'test ' | \
+fwhere=`objdump -Mintel -d "$input" | grep -B12 "# $addr" | grep 'mov.*edx' | \
         head -1 | grep -o '^ *[0-9a-z]*' | tr -d ' ' ||:`
-[ -n "$fwhere" ] || error "Failed to local test instruction prior to usage of $addr."
+[ -n "$fwhere" ] || error "Failed to local mov edx instruction prior to usage of $addr."
 debug "fwhere: $fwhere"
 
 read -r floc offset <<<"`objdump -Mintel -F -d "$input" | \
@@ -119,8 +119,9 @@ where=$(expr `printf %d $offset` + $foffset)
 debug "where: $where"
 
 cp "$input" "$output"
-dd if="$input" bs=1 skip=$where count=3 status=none | sed 's/\x85/\x31/' | \
-  dd of="$output" bs=1 seek=$where count=3 conv=notrunc status=none
+dd if="$input" bs=1 skip=$where count=4 status=none | sed 's/\x8b\x54\x24\x48/\x31\xd2\x90\x90/' | \
+  dd of="$output" bs=1 seek=$where count=4 conv=notrunc status=none
 chmod +x "$output"
 
 [ -n "$doset" ] && patchelf --set-interpreter "$output" "$doset" ||:
+
