@@ -97,11 +97,11 @@ addr=`echo "$column" | sed 's/^ *//' | cut -d ' ' -f1`
 debug "addr: $addr"
 
 if echo "$column" | grep -q 'no versi$'; then
-    debug "moving address"
+  debug "moving address"
   addr=`echo "$addr" | sed 's/0$/8/'`
 fi
 
-fwhere=`objdump -Mintel -d "$input" | grep -B10 "# $addr" | tac | grep 'test ' | \
+fwhere=`objdump -Mintel -d "$input" | grep -B20 "# $addr" | grep 'test *e' | \
         head -1 | grep -o '^ *[0-9a-z]*' | tr -d ' ' ||:`
 [ -n "$fwhere" ] || error "Failed to local test instruction prior to usage of $addr."
 debug "fwhere: $fwhere"
