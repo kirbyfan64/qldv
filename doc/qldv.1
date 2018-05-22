@@ -1,128 +1,115 @@
-.\" generated with Ronn/v0.7.3
-.\" http://github.com/rtomayko/ronn/tree/0.7.3
-.
-.TH "QLDV" "1" "January 2018" "" ""
-.
-.SH "NAME"
-\fBqldv\fR \- create a patched ld\-linux\.so without version information warnings
-.
-.SH "SYNOPSIS"
-\fBqldv\fR interpreter\-to\-patch [output=input\-interpreter\.nodebug]
-.
-.P
-\fBqldv\fR \-set executable\-to\-patch [output=\-input\-executable\-interpreter\.nodebug]
-.
-.P
-\fBqldv\fR \-find [executable=/bin/sh]
-.
-.P
-\fBqldv\fR \-version
-.
-.SH "DESCRIPTION"
-\fBqldv\fR creates a patched version of ld\-linux\.so (the dynamic linker) that does not emit warnings like these:
-.
-.IP "" 4
-.
-.nf
+.TH "QLDV" "1" "" "" "qldv"
+.SH NAME
+\fBqldv\fR(1) - create a patched ld-linux\.so without version information warnings
+.SH SYNOPSIS
 
-myprog: /usr/lib/libxyz\.so: no version information available (required by myprog)
-.
+\fBqldv\fR interpreter-to-patch [output=input-interpreter\.nodebug]
+
+
+\fBqldv\fR -set executable-to-patch [output=-input-executable-interpreter\.nodebug]
+
+
+\fBqldv\fR -find [executable=/bin/sh]
+
+
+\fBqldv\fR -version
+
+.SH DESCRIPTION
+
+\fBqldv\fR creates a patched version of ld-linux\.so (the dynamic linker) that does not emit
+warnings like these:
+
+.nf
+.RS
+myprog: /usr/lib/libxyz.so: no version information available (required by myprog)
+.RE
+
 .fi
-.
-.IP "" 0
-.
-.P
-In its first form, \fBqldv\fR takes the first argument (an ld\-linux\.so interpreter) and creates a copy that does not emit version information warnings\. If a second argument is given, it will be used as the location to place the new, patched linker\. If it is omitted,the patched linker will be placed in the same directory as the input file, with a \fB\.nodebug\fR appended to the extension\. After running \fBqldv\fR, the user is still responsible for having any executables use the new linker\.
-.
-.P
-In its second form, \fBqldv\fR takes an executable that is emitting version information warnings\. It will both patch the dynamic linker the executable is using \fIand\fR patch the executable to point to the new linker\. The second argument (the output path) is used in the exact same way as before\.
-.
-.P
-In its third form, \fBqldv\fR will print the dynamic linker used by the given executable\. If no argument is passed, \fB/bin/sh\fR will be used\. In this form, it is simply a thin wrapper around \fBpatchelf \-\-print\-interpreter\fR\.
-.
-.P
+
+In its first form, \fBqldv\fR takes the first argument (an ld-linux\.so interpreter) and
+creates a copy that does not emit version information warnings\. If a second argument is
+given, it will be used as the location to place the new, patched linker\. If it is
+omitted,the patched linker will be placed in the same directory as the input file,
+with a \fB.nodebug\fR appended to the extension\. After running \fBqldv\fR, the user is still
+responsible for having any executables use the new linker\.
+
+
+In its second form, \fBqldv\fR takes an executable that is emitting version information
+warnings\. It will both patch the dynamic linker the executable is using \fIand\fR patch the
+executable to point to the new linker\. The second argument (the output path) is used
+in the exact same way as before\.
+
+
+In its third form, \fBqldv\fR will print the dynamic linker used by the given executable\.
+If no argument is passed, \fB/bin/sh\fR will be used\. In this form, it is simply a thin
+wrapper around \fBpatchelf --print-interpreter\fR\.
+
+
 In its fourth form, \fBqldv\fR will print its version and license, and then exit\.
-.
-.SH "EXAMPLES"
-Patch \fB/lib64/ld\-linux\.so\.2\fR, saving the new version at \fB/lib64/ld\-linux\.so\.2\.nodebug\fR:
-.
-.IP "" 4
-.
-.nf
 
-qldv /lib64/ld\-linux\.so\.2
-.
-.fi
-.
-.IP "" 0
-.
-.P
-Patch \fB/lib64/ld\-linux\.so\.2\fR, saving the new version at \fBpatched\-linker\.so\fR:
-.
-.IP "" 4
-.
-.nf
+.SH EXAMPLES
 
-qldv /lib64/patched\-linker\.so
-.
-.fi
-.
-.IP "" 0
-.
-.P
-Assuming \fBmyprog\fR uses \fB/lib64/ld\-linux\.so\.2\fR, patch \fB/lib64/ld\-linux\.so\.2\fR, saving the new version at \fB/lib64/ld\-linux\.so\.2\.nodebug\fR, and update \fBmyprog\fR to point to the new version:
-.
-.IP "" 4
-.
-.nf
+Patch \fB/lib64/ld-linux.so.2\fR, saving the new version at \fB/lib64/ld-linux.so.2.nodebug\fR:
 
-qldv \-set myprog
-.
-.fi
-.
-.IP "" 0
-.
-.P
-Assuming \fBmyprog\fR uses \fB/lib64/ld\-linux\.so\.2\fR, patch \fB/lib64/ld\-linux\.so\.2\fR, saving the new version at \fBpatched\-linker\.so\fR, and update \fBmyprog\fR to point to the new version:
-.
-.IP "" 4
-.
 .nf
+.RS
+qldv /lib64/ld-linux.so.2
+.RE
 
-qldv \-set myprog patched\-linker\.so
-.
 .fi
-.
-.IP "" 0
-.
-.P
+
+Patch \fB/lib64/ld-linux.so.2\fR, saving the new version at \fBpatched-linker.so\fR:
+
+.nf
+.RS
+qldv /lib64/patched-linker.so
+.RE
+
+.fi
+
+Assuming \fBmyprog\fR uses \fB/lib64/ld-linux.so.2\fR, patch \fB/lib64/ld-linux.so.2\fR, saving the
+new version at \fB/lib64/ld-linux.so.2.nodebug\fR, and update \fBmyprog\fR to point to the new
+version:
+
+.nf
+.RS
+qldv -set myprog
+.RE
+
+.fi
+
+Assuming \fBmyprog\fR uses \fB/lib64/ld-linux.so.2\fR, patch \fB/lib64/ld-linux.so.2\fR, saving the
+new version at \fBpatched-linker.so\fR, and update \fBmyprog\fR to point to the new version:
+
+.nf
+.RS
+qldv -set myprog patched-linker.so
+.RE
+
+.fi
+
 Print the path to the dynamic linker used by \fB/bin/sh\fR:
-.
-.IP "" 4
-.
-.nf
 
-qldv \-find
-.
+.nf
+.RS
+qldv -find
+.RE
+
 .fi
-.
-.IP "" 0
-.
-.P
+
 Print the path to the dynamic linker used by \fBmyprog\fR:
-.
-.IP "" 4
-.
-.nf
 
-qldv \-find myprog
-.
+.nf
+.RS
+qldv -find myprog
+.RE
+
 .fi
-.
-.IP "" 0
-.
-.SH "AUTHOR"
-Ryan Gonzalez <rymg19@gmail\.com>
-.
-.SH "SEE ALSO"
-\fBld\.so\fR(8)
+.SH AUTHOR
+
+Ryan Gonzalez \\\fIrymg19@gmail.com\fR
+
+.SH SEE ALSO
+
+\fBld.so\fR(8)
+
