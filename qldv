@@ -102,7 +102,7 @@ if echo "$column" | grep -q 'no versi$'; then
 fi
 
 fwhere=`objdump -Mintel -d "$input" | grep -B20 "# $addr" | grep 'test *e' | \
-        head -1 | grep -o '^ *[0-9a-z]*' | tr -d ' ' ||:`
+        tail -1 | grep -o '^ *[0-9a-z]*' | tr -d ' ' ||:`
 [ -n "$fwhere" ] || error "Failed to local test instruction prior to usage of $addr."
 debug "fwhere: $fwhere"
 
